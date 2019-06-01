@@ -6,3 +6,8 @@ page = requests.get('https://www.otomoto.pl/motocykle-i-quady/yamaha/mt/?search%
                     'ter_enum_no_accident%5D=1&search%5Bprivate_business%5D=private&search%5Bcountry%5D=')
 
 soup = BeautifulSoup(page.text, 'html.parser')
+
+offers_list = soup.find_all('article')
+
+for article in offers_list:
+    print(article['data-ad-id'])
