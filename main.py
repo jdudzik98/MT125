@@ -16,10 +16,13 @@ offers_list = soup.find_all('article')
 # loop adding to data dict of
 for article in offers_list:
     article_id = article['data-ad-id']
+    article_price = article.find(class_='offer-price__number').contents[0].replace(' ', '')
+    article_year = article.find_all(class_='offer-item__params-item')[0].span.contents[0]
+    article_mileage = article.find_all(class_='offer-item__params-item')[1].span.contents[0]
+    article_link = article['data-href']
     # checking if our record isn't already in database
     if not any(d['id'] == article_id for d in turbolist):
-        turbolist.append({'id': article_id, 'price': article.find(class_='offer-price__number').contents[0].replace(
-            ' ', '')})
-
+        turbolist.append({'id': article_id, 'price': article_price, 'year': article_year, 'mileage': article_mileage,
+                          'link': article_link})
 
 print(turbolist)
