@@ -1,6 +1,14 @@
 from bs4 import BeautifulSoup
 import requests
+from flask import Flask, render_template, g, jsonify
+import sqlite3
 
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'hello'
+"""
 # creating list that will contain data of our offers
 turbolist = []
 
@@ -26,3 +34,6 @@ for article in offers_list:
                           'link': article_link})
 
 print(turbolist)
+"""
+if __name__ == '__main__':
+    app.run()
