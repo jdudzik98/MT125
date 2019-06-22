@@ -3,7 +3,21 @@ import requests
 from flask import Flask, render_template, g, jsonify
 import sqlite3
 
+DATABASE = 'MT125_storage.db'
+
 app = Flask(__name__)
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 @app.route('/')
 def hello_world():
@@ -24,7 +38,7 @@ def scrap_the_data():
     # creating list of offers with parsing by 'article' tag
     offers_list = soup.find_all('article')
 
-    # loop adding to data dict of
+    # loop adding dict to data
     for article in offers_list:
         article_id = article['data-ad-id']
         article_price = article.find(class_='offer-price__number').contents[0].replace(' ', '')
@@ -36,6 +50,7 @@ def scrap_the_data():
             turbolist.append(
                 {'id': article_id, 'price': article_price, 'year': article_year, 'mileage': article_mileage,
                  'link': article_link})
+
 
 
     return str(turbolist)
