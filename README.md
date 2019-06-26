@@ -11,7 +11,5 @@ Issues:
 -Create a webscraping script with BeautifulSoup that will scrap data and contain it in dicts
 -Set up Flask app 
 -Connect to database
--Create authorization decorator  
--Create endpoint scraping and iserting the data to database (and then waiting whole day)
 -Create endpoints for analysing data
 -Create charts
