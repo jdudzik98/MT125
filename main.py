@@ -23,6 +23,15 @@ def close_connection(exception):
 def hello_world():
     return 'hello'
 
+@app.route('/create_table')
+def create_table():
+    cursor = get_db().cursor()
+    cursor.execute('CREATE TABLE offers(article_id int, article_price int, article_year int, article_mileage int, '
+                   + 'article_link message_text )').fetchall()
+    cursor.close()
+
+    return 'Done'
+
 @app.route('/simple_scrap')
 def scrap_the_data():
     # creating list that will contain data of our offers
