@@ -32,8 +32,17 @@ def create_table():
 
     return 'Done'
 
-@app.route('/simple_scrap')
+@app.route('/printall')
+def printall():
+    cursor = get_db().cursor()
+    data = cursor.execute('SELECT * FROM offers').fetchall()
+    cursor.close()
+    return jsonify(data)
+
+
 def scrap_the_data():
+    """Function that scrap desired data and returns list of records as dictionaries"""
+
     # creating list that will contain data of our offers
     turbolist = []
 
@@ -59,11 +68,22 @@ def scrap_the_data():
             turbolist.append(
                 {'id': article_id, 'price': article_price, 'year': article_year, 'mileage': article_mileage,
                  'link': article_link})
+    return turbolist
 
+@app.route('/add_scrapped_data')
+def add_data():
+    newdata = [1, 2, 3, 4, 'piec']
+    cursor = get_db().cursor()
+    for single_offer in scrap_the_data():
 
+        cursor.execute(
+            'INSERT INTO offers (article_id,article_price, article_year, article_mileage,article_link) VALUES (?,?,?,?,?)',
+            (list(single_offer.values())), ).fetchall()
+        get_db().commit()
 
-    return str(turbolist)
+    cursor.close()
 
+    return 'scrapped'
 
 if __name__ == '__main__':
     app.run()
