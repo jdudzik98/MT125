@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 import requests
-from flask import Flask, render_template, g, jsonify
+from flask import Flask, g, jsonify
 import sqlite3
+
 
 DATABASE = 'MT125_storage.db'
 
 app = Flask(__name__)
+
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -13,15 +15,18 @@ def get_db():
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
+
 @app.route('/')
 def hello_world():
     return 'hello'
+
 
 @app.route('/create_table')
 def create_table():
@@ -29,8 +34,8 @@ def create_table():
     cursor.execute('CREATE TABLE offers(article_id int, article_price int, article_year int, article_mileage int, '
                    + 'article_link message_text )').fetchall()
     cursor.close()
-
     return 'Done'
+
 
 @app.route('/printall')
 def printall():
@@ -70,20 +75,32 @@ def scrap_the_data():
                  'link': article_link})
     return turbolist
 
+
 @app.route('/add_scrapped_data')
 def add_data():
-    newdata = [1, 2, 3, 4, 'piec']
+
     cursor = get_db().cursor()
+    articles_already_in_db = 0
+    artcles_added_to_db = 0
+
     for single_offer in scrap_the_data():
 
-        cursor.execute(
-            'INSERT INTO offers (article_id,article_price, article_year, article_mileage,article_link) VALUES (?,?,?,?,?)',
-            (list(single_offer.values())), ).fetchall()
-        get_db().commit()
+        data = cursor.execute('SELECT article_id FROM offers WHERE article_id = ?', (single_offer['id'],)).fetchall()
+
+        if data == 0:
+            cursor.execute('INSERT INTO offers (article_id, article_price, article_year, article_mileage, article_link)'
+                           'VALUES (?,?,?,?,?)', (list(single_offer.values())), ).fetchall()
+            artcles_added_to_db += 1
+            get_db().commit()
+        else:
+            articles_already_in_db += 1
 
     cursor.close()
 
-    return 'scrapped'
+    message = f'{artcles_added_to_db} offers were added to Database. {articles_already_in_db} offers Were already there'
+
+    return message
+
 
 if __name__ == '__main__':
     app.run()
