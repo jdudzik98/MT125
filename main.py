@@ -76,6 +76,16 @@ def scrap_the_data():
     return turbolist
 
 
+def correctly_message_variable(number):
+    """ Function required to return grammatically correct messages about number of offers"""
+    if number == 0:
+        return '0 offers were'
+    elif number == 1:
+        return '1 offer was'
+    elif number >= 2:
+        return f'{number} offers were'
+
+
 @app.route('/add_scrapped_data')
 def add_data():
 
@@ -97,9 +107,8 @@ def add_data():
 
     cursor.close()
 
-    message = f'{artcles_added_to_db} offers were added to Database. {articles_already_in_db} offers Were already there'
-
-    return message
+    return f'{correctly_message_variable(artcles_added_to_db)} added to Database. ' \
+        f'{correctly_message_variable(articles_already_in_db)} already there'
 
 
 if __name__ == '__main__':
